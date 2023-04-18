@@ -3,7 +3,7 @@ const User = require('../models/user');
 module.exports.getUsers = (req, res) => {
   User.find({})
   .populate(['name', 'about', 'avatar'])
-  .then(user => res.send({data: user}))
+  .then(user => res.status(200).send({data: user}))
   .catch(err => {
     if(err.name === 'NotFound') {
       res.status(404).send({message: "Пользователь с таким id не найден."});
@@ -43,7 +43,7 @@ module.exports.createUser = (req, res) => {
   console.log(req.body);
   User.create({name, about, avatar})
   .then((newUser) => {
-    res.send(newUser);
+    res.status(200).send(newUser);
     console.log(newUser);
   })
   .catch((err) => {
@@ -61,7 +61,7 @@ module.exports.updateUser = (req, res) => {
   const userId = req.user._id;
   const {name, about} = req.body;
   User.findByIdAndUpdate(userId, {name, about}, {new : true})
-  .then((user) => res.send(user))
+  .then((user) => res.status(200).send(user))
   .catch((err) => {
     if(err.name === 'NotFound') {
       res.status(404).send({message: "Пользователь с таким id не найден."});
@@ -77,7 +77,7 @@ module.exports.updateAvatar = (req, res) => {
   const userId = req.user._id;
   const {avatar} = req.body;
   User.findByIdAndUpdate(userId, {avatar}, {new : true})
-  .then((user) => res.send(user))
+  .then((user) => res.status(200).send(user))
   .catch((err) => {
     if(err.name === 'NotFound') {
       res.status(404).send({message: "Пользователь с таким id не найден."});

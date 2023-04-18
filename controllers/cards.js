@@ -3,7 +3,7 @@ const Card = require('../models/card');
 module.exports.getCard = (req, res) => {
   Card.find({})
   .populate(['name', 'link'])
-  .then(card => res.send({data: card}))
+  .then(card => res.status(200).send({data: card}))
   .catch(err => {
     if(err.name === 'NotFound') {
       res.status(404).send({message: "Карточка с таким id не найдена."});
@@ -18,11 +18,9 @@ module.exports.getCard = (req, res) => {
 module.exports.createCard = (req, res) => {
   const owner = req.user._id;
   const {name, link} = req.body;
-  console.log(req.body);
   Card.create({name, link, owner})
   .then((newCard) => {
-    res.send(newCard);
-    console.log(newCard);
+    res.status(200).send(newCard);
   })
   .catch((err) => {
     if(err.name === 'NotFound') {
@@ -37,7 +35,6 @@ module.exports.createCard = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   const cardId = req.params.cardId
-  console.log(cardId);
   Card.findByIdAndRemove(cardId)
   .then((card) => {
     if(!card) {
