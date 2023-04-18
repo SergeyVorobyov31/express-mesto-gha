@@ -27,11 +27,10 @@ module.exports.getUsersById = (req, res) => {
     res.status(200).send(user);
   })
   .catch((err) => {
-    console.log(err);
     if(err.name === 'NotFound') {
       res.status(404).send({message: "Пользователь с таким id не найден."});
     } else if (err.name === "CastError" || "ValidatorError") {
-      res.status(400).send({message: "Введены некоректные данные."});
+      res.status(400).send({message: "Пользователь с таким id не найден."});
     } else {
       res.status(500).send({message: "Ошибка на сервере."});
     }
