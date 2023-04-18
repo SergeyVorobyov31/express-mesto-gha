@@ -38,7 +38,7 @@ module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(cardId)
   .then((card) => {
     if(!card) {
-      res.status(400).send({message: "Карточка не найдена"});
+      res.status(404).send({message: "Карточка не найдена"});
       return
     }
     res.status(200).send(card);
@@ -59,7 +59,7 @@ module.exports.likeCard = (req, res) => {
   .populate('owner')
   .then((like) => {
     if(!like) {
-      res.status(400).send({message: "Данная карточка не найдена"});
+      res.status(404).send({message: "Данная карточка не найдена"});
       return
     }
     res.status(200).send(like);
@@ -79,7 +79,7 @@ module.exports.dislikeCard = (req, res) => {
   .populate('owner')
   .then((like) => {
     if(!like) {
-      res.status(400).send({message: "Данная карточка не найдена"});
+      res.status(404).send({message: "Данная карточка не найдена"});
       return
     }
     res.status(200).send(like);
