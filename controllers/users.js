@@ -3,7 +3,7 @@ const User = require('../models/user');
 module.exports.getUsers = (req, res) => {
   User.find({})
   .populate(['name', 'about', 'avatar'])
-  .then(user => res.status(200).send({data: user}))
+  .then(user => res.status(200).send(user))
   .catch(err => {
     if(err.name === 'NotFound') {
       res.status(404).send({message: "Пользователь с таким id не найден."});
@@ -44,7 +44,6 @@ module.exports.createUser = (req, res) => {
   User.create({name, about, avatar})
   .then((newUser) => {
     res.status(200).send(newUser);
-    console.log(newUser);
   })
   .catch((err) => {
     if(err.name === 'NotFound') {
