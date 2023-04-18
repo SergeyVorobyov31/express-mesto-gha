@@ -7,7 +7,7 @@ module.exports.getUsers = (req, res) => {
   .catch(err => {
     if(err.name === 'NotFound') {
       res.status(404).send({message: "Пользователь с таким id не найден."});
-    } else if (err.name === "CastError") {
+    } else if (err.name === "CastError" || "ValidatorError") {
       res.status(400).send({message: "Введены некоректные данные."});
     } else {
       res.status(500).send({message: "Ошибка на сервере."});
@@ -30,7 +30,7 @@ module.exports.getUsersById = (req, res) => {
     console.log(err);
     if(err.name === 'NotFound') {
       res.status(404).send({message: "Пользователь с таким id не найден."});
-    } else if (err.name === "CastError") {
+    } else if (err.name === "CastError" || "ValidatorError") {
       res.status(400).send({message: "Введены некоректные данные."});
     } else {
       res.status(500).send({message: "Ошибка на сервере."});
@@ -46,9 +46,10 @@ module.exports.createUser = (req, res) => {
     res.status(200).send(newUser);
   })
   .catch((err) => {
+    console.log(err);
     if(err.name === 'NotFound') {
       res.status(404).send({message: "Пользователь с таким id не найден."});
-    } else if (err.name === "CastError") {
+    } else if (err.name === "CastError" || "ValidatorError") {
       res.status(400).send({message: "Введены некоректные данные."});
     } else {
       res.status(500).send({message: "Ошибка на сервере."});
@@ -64,7 +65,7 @@ module.exports.updateUser = (req, res) => {
   .catch((err) => {
     if(err.name === 'NotFound') {
       res.status(404).send({message: "Пользователь с таким id не найден."});
-    } else if (err.name === "CastError") {
+    } else if (err.name === "CastError"|| "ValidatorError") {
       res.status(400).send({message: "Введены некоректные данные."});
     } else {
       res.status(500).send({message: "Ошибка на сервере."});
@@ -80,7 +81,7 @@ module.exports.updateAvatar = (req, res) => {
   .catch((err) => {
     if(err.name === 'NotFound') {
       res.status(404).send({message: "Пользователь с таким id не найден."});
-    } else if (err.name === "CastError") {
+    } else if (err.name === "CastError" || "ValidatorError") {
       res.status(400).send({message: "Введены некоректные данные."});
     } else {
       res.status(500).send({message: "Ошибка на сервере."});

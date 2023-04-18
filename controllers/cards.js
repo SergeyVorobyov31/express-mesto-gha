@@ -7,7 +7,7 @@ module.exports.getCard = (req, res) => {
   .catch(err => {
     if(err.name === 'NotFound') {
       res.status(404).send({message: "Карточка с таким id не найдена."});
-    } else if (err.name === "CastError") {
+    } else if (err.name === "CastError" || "ValidatorError") {
       res.status(400).send({message: "Введены некоректные данные."});
     } else {
       res.status(500).send({message: "Ошибка на сервере."});
@@ -25,7 +25,7 @@ module.exports.createCard = (req, res) => {
   .catch((err) => {
     if(err.name === 'NotFound') {
       res.status(404).send({message: "Карточка с таким id не найдена."});
-    } else if (err.name === "CastError") {
+    } else if (err.name === "CastError" || "ValidatorError") {
       res.status(400).send({message: "Введены некоректные данные."});
     } else {
       res.status(500).send({message: "Ошибка на сервере."});
@@ -45,7 +45,7 @@ module.exports.deleteCard = (req, res) => {
     console.log("Карточка успешно удалена");
   })
   .catch(err => {
-    if(err.name === "CastError") {
+    if(err.name === "CastError" || "ValidatorError") {
       res.status(400).send({message: "Данная карточка не найдена."});
     } else {
       res.status(500).send({message: "Ошибка на сервере."});
@@ -65,7 +65,7 @@ module.exports.likeCard = (req, res) => {
     res.status(200).send(like);
   })
   .catch(err => {
-    if(err.name === "CastError") {
+    if(err.name === "CastError" || "ValidatorError") {
       res.status(400).send({message: "Данная карточка не найдена."});
     } else {
       res.status(500).send({message: "Ошибка на сервере."});
@@ -85,7 +85,7 @@ module.exports.dislikeCard = (req, res) => {
     res.status(200).send(like);
   })
   .catch(err => {
-    if(err.name === "CastError") {
+    if(err.name === "CastError" || "ValidatorError") {
       res.status(400).send({message: "Данная карточка не найдена."});
     } else {
       res.status(500).send({message: "Ошибка на сервере."});
