@@ -19,18 +19,19 @@ module.exports.getUsersById = (req, res) => {
   const userId = req.params.userId;
   return User.findById(userId)
   .orFail(() => {
-    const error = new Error("Пользователь с таким id не найден.");
-    Error.statusCode = 400;
+    const error = new Error("Пользователь с таким id не найден. Несуществующий id.");
+    error.statusCode = 404;
+    error.name = "NotFound"
+    throw error;
   })
   .then((user) => {
     res.status(200).send(user);
   })
   .catch((err) => {
-    console.log(err.name);
-    if(err.name === 'BadRequest') {
-      res.status(400).send({message: "Пользователь с таким id не найден."});
-    } else if (err.name === "CastError" || "ValidatorError" || "NotFound") {
-      res.status(404).send({message: "Пользователь с таким id не найден."});
+    if(err.name === "CastError") {
+      res.status(400).send({message: "Пользователь с таким id не найден. Некорректный id"});
+    } else if (err.name === "NotFound") {
+      res.status(404).send({message: "Пользователь с таким id не найден. Несуществующий id"});
     } else {
       res.status(500).send({message: "Ошибка на сервере."});
     }
