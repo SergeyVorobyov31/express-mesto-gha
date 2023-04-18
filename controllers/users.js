@@ -20,16 +20,16 @@ module.exports.getUsersById = (req, res) => {
   return User.findById(userId)
   .orFail(() => {
     const error = new Error("Пользователь с таким id не найден.");
-    Error.statusCode = 404
+    Error.statusCode = 400;
   })
   .then((user) => {
     res.status(200).send(user);
   })
   .catch((err) => {
     console.log(err.name);
-    if(err.name === 'NotFound') {
+    if(err.name === 'BadRequest') {
       res.status(400).send({message: "Пользователь с таким id не найден."});
-    } else if (err.name === "CastError" || "ValidatorError") {
+    } else if (err.name === "CastError" || "ValidatorError" || "NotFound") {
       res.status(404).send({message: "Пользователь с таким id не найден."});
     } else {
       res.status(500).send({message: "Ошибка на сервере."});
