@@ -13,7 +13,7 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUsersById = (req, res) => {
-  const { userId } = req.params.userId;
+  const { userId } = req.params;
   return User.findById(userId)
     .orFail(() => {
       const error = new Error('Пользователь с таким id не найден. Несуществующий id.');
@@ -42,7 +42,7 @@ module.exports.createUser = (req, res) => {
       res.send(newUser);
     })
     .catch((err) => {
-      if (err.name === 'ValidatorError') {
+      if (err.name === 'ValidationError') {
         res.status(ERROR_CODE_400).send({ message: 'Введены некоректные данные.' });
       } else {
         res.status(ERROR_CODE_500).send({ message: 'Ошибка на сервере.' });
@@ -66,7 +66,7 @@ module.exports.updateUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'NotFound') {
         res.status(ERROR_CODE_404).send({ message: 'Пользователь с таким id не найден.' });
-      } else if (err.name === 'ValidatorError') {
+      } else if (err.name === 'ValidationError') {
         res.status(ERROR_CODE_400).send({ message: 'Введены некоректные данные.' });
       } else {
         res.status(ERROR_CODE_500).send({ message: 'Ошибка на сервере.' });
@@ -90,7 +90,7 @@ module.exports.updateAvatar = (req, res) => {
     .catch((err) => {
       if (err.name === 'NotFound') {
         res.status(ERROR_CODE_404).send({ message: 'Пользователь с таким id не найден.' });
-      } else if (err.name === 'ValidatorError') {
+      } else if (err.name === 'ValidationError') {
         res.status(ERROR_CODE_400).send({ message: 'Введены некоректные данные.' });
       } else {
         res.status(ERROR_CODE_500).send({ message: 'Ошибка на сервере.' });

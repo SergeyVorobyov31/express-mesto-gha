@@ -20,7 +20,7 @@ module.exports.createCard = (req, res) => {
       res.send(newCard);
     })
     .catch((err) => {
-      if (err.name === 'ValidatorError') {
+      if (err.name === 'ValidationError') {
         res.status(ERROR_CODE_400).send({ message: 'Введены некоректные данные.' });
       } else {
         res.status(ERROR_CODE_500).send({ message: 'Ошибка на сервере.' });
@@ -29,7 +29,7 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  const { cardId } = req.params.cardId;
+  const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
