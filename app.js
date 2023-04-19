@@ -1,7 +1,9 @@
 const express = require('express');
-const path = require('path');
+
 const mongoose = require('mongoose');
+
 const bodyParser = require('body-parser');
+
 const { PORT = 3000 } = process.env;
 const app = express();
 
@@ -12,18 +14,20 @@ mongoose.connect('mongodb://127.0.0.1/mestodb').then(() => console.log('Успе
 
 app.use((req, res, next) => {
   req.user = {
-    _id: '643ab8febfc6f3eba6567790'
+    _id: '643ab8febfc6f3eba6567790',
   };
 
   next();
 });
 
 app.use('/users', require('./routes/users'));
+
 app.use('/cards', require('./routes/cards'));
+
 app.use('*', (req, res) => {
-  res.status(404).send({message: "Данного маршрута не существует"});
-})
+  res.status(404).send({ message: 'Данного маршрута не существует' });
+});
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
-})
+});
