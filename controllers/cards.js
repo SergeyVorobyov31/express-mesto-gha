@@ -1,35 +1,28 @@
 const Card = require('../models/card');
-
-const ERROR_CODE_400 = 400;
-const ERROR_CODE_404 = 404;
-const ERROR_CODE_500 = 500;
+const { BadRequestError, NotFoundError, ServerError, ForbiddenError } = require('../errors/errors');
 
 module.exports.getCard = (req, res, next) => {
   Card.find({})
     .then((card) => res.send({ data: card }))
     .catch(() => {
-      const err = new Error('Ошибка на сервере.');
-      err.statusCode = ERROR_CODE_500;
-      next(err);
+      next(new ServerError('Ошибка на сервере'));
     });
 };
 
 module.exports.createCard = (req, res, next) => {
   const owner = req.user.id;
+  console.log(req.body);
   const { name, link } = req.body;
   Card.create({ name, link, owner })
     .then((newCard) => {
       res.send(newCard);
     })
     .catch((e) => {
+      console.log(e);
       if (e.name === 'ValidationError') {
-        const err = new Error('Введены некоректные данные.');
-        err.statusCode = ERROR_CODE_400;
-        next(err);
+        next(new BadRequestError('Введены некоректные данные.'));
       } else {
-        const err = new Error('Ошибка на сервере.');
-        err.statusCode = ERROR_CODE_500;
-        next(err);
+        next(new ServerError('Ошибка на сервере.'));
       }
     });
 };
@@ -39,30 +32,30 @@ module.exports.deleteCard = (req, res, next) => {
   const owner = req.user.id;
   Card.findById(cardId)
     .then((card) => {
+      if (!card) {
+        next(new NotFoundError('Карточка не найдена.'));
+        return;
+      }
       const cardOwner = card.owner.toString();
       if (owner !== cardOwner) {
-        res.status(ERROR_CODE_404).send({ message: 'Карточка не принадлежит данному пользователю' });
+        next(new ForbiddenError('Карточка не принадлежит данному пользователю.'));
+        return;
       } else {
         Card.findByIdAndRemove(cardId)
           .then(() => {
-            if (!card) {
-              res.status(ERROR_CODE_404).send({ message: 'Карточка не найдена' });
-              return;
-            }
-            res.send(card, { message: 'Карточка успешно удалена' });
+            res.send({ message: 'Карточка успешно удалена' });
+          })
+          .catch(() => {
+            next(new ServerError('Ошибка на сервере.'));
           });
       }
     })
     .catch((e) => {
       res.send(e);
       if (e.name === 'CastError') {
-        const err = new Error('Передан некорректный id.');
-        err.statusCode = ERROR_CODE_400;
-        next(err);
+        next(new BadRequestError('Передан некорректный id.'));
       } else {
-        const err = new Error('Ошибка на сервере.');
-        err.statusCode = ERROR_CODE_500;
-        next(err);
+        next(new ServerError('Ошибка на сервере.'));
       }
     });
 };
@@ -73,20 +66,15 @@ module.exports.likeCard = (req, res, next) => {
     .populate('owner')
     .then((like) => {
       if (!like) {
-        res.status(ERROR_CODE_404).send({ message: 'Данная карточка не найдена' });
-        return;
+        next(new NotFoundError('Данная карточка не найдена.'));
       }
       res.send(like);
     })
     .catch((e) => {
       if (e.name === 'CastError') {
-        const err = new Error('Передан некорректный id.');
-        err.statusCode = ERROR_CODE_400;
-        next(err);
+        next(new BadRequestError('Передан некорректный id.'));
       } else {
-        const err = new Error('Ошибка на сервере.');
-        err.statusCode = ERROR_CODE_500;
-        next(err);
+        next(new ServerError('Ошибка на сервере.'));
       }
     });
 };
@@ -97,20 +85,15 @@ module.exports.dislikeCard = (req, res, next) => {
     .populate('owner')
     .then((like) => {
       if (!like) {
-        res.status(ERROR_CODE_404).send({ message: 'Данная карточка не найдена' });
-        return;
+        next(new NotFoundError('Данная карточка не найдена.'));
       }
       res.send(like);
     })
     .catch((e) => {
       if (e.name === 'CastError') {
-        const err = new Error('Передан некорректный id.');
-        err.statusCode = ERROR_CODE_400;
-        next(err);
+        next(new BadRequestError('Передан некорректный id.'));
       } else {
-        const err = new Error('Ошибка на сервере.');
-        err.statusCode = ERROR_CODE_500;
-        next(err);
+        next(new ServerError('Ошибка на сервере.'));
       }
     });
 };
