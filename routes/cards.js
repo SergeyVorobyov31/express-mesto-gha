@@ -23,7 +23,7 @@ router.delete('/:cardId/likes', celebrate({
 }), dislikeCard);
 router.post('/', celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required(),
+    name: Joi.string().min(2).max(30).required(),
     link: Joi.string().regex(/[-a-zA-Z0-9@:%_+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_+.~#?&//=]*)?/i).required(),
   }),
 }), createCard);

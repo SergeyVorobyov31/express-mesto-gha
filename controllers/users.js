@@ -21,7 +21,7 @@ module.exports.getMyUser = (req, res, next) => {
   const userId = req.user.id;
   return User.findById(userId)
     .orFail(() => {
-      throw NotFoundError('Пользователь с таким id не найден. Несуществующий id.');
+      throw new NotFoundError('Пользователь с таким id не найден. Несуществующий id.');
     })
     .then((user) => {
       res.send(user);
@@ -29,12 +29,11 @@ module.exports.getMyUser = (req, res, next) => {
     .catch((e) => {
       if (e.name === 'CastError') {
         next(new BadRequestError('Пользователь с таким id не найден. Некорректный id.'));
-      } else if (e.name === 'NotFound') {
+      } else if (e.statusCode === 404) {
         next(e);
       } else {
         next(new ServerError('Ошибка на сервере.'));
       }
-      next(e);
     });
 };
 
@@ -42,7 +41,7 @@ module.exports.getUsersById = (req, res, next) => {
   const { userId } = req.params;
   return User.findById(userId)
     .orFail(() => {
-      throw NotFoundError('Пользователь с таким id не найден. Несуществующий id.');
+      throw new NotFoundError('Пользователь с таким id не найден. Несуществующий id.');
     })
     .then((user) => {
       res.send(user);
@@ -50,12 +49,11 @@ module.exports.getUsersById = (req, res, next) => {
     .catch((e) => {
       if (e.name === 'CastError') {
         next(new BadRequestError('Пользователь с таким id не найден. Некорректный id.'));
-      } else if (e.name === 'NotFound') {
+      } else if (e.statusCode === 404) {
         next(e);
       } else {
         next(new ServerError('Ошибка на сервере.'));
       }
-      next(e);
     });
 };
 
@@ -95,20 +93,19 @@ module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
     .orFail(() => {
-      throw NotFoundError('Пользователь с таким id не найден.');
+      throw new NotFoundError('Пользователь с таким id не найден.');
     })
     .then((user) => {
       res.send(user);
     })
     .catch((e) => {
-      if (e.name === 'NotFound') {
+      if (e.statusCode === 404) {
         next(e);
       } else if (e.name === 'ValidationError') {
         next(new BadRequestError('Введены некоректные данные.'));
       } else {
         next(new ServerError('Ошибка на сервере.'));
       }
-      next(e);
     });
 };
 
@@ -117,20 +114,19 @@ module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
     .orFail(() => {
-      throw NotFoundError('Пользователь с таким id не найден.');
+      throw new NotFoundError('Пользователь с таким id не найден.');
     })
     .then((user) => {
       res.send(user);
     })
     .catch((e) => {
-      if (e.name === 'NotFound') {
+      if (e.statusCode === 404) {
         next(e);
       } else if (e.name === 'ValidationError') {
         next(new BadRequestError('Введены некоректные данные.'));
       } else {
         next(new ServerError('Ошибка на сервере.'));
       }
-      next(e);
     });
 };
 

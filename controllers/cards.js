@@ -67,6 +67,7 @@ module.exports.likeCard = (req, res, next) => {
     .then((like) => {
       if (!like) {
         next(new NotFoundError('Данная карточка не найдена.'));
+        return; // если поставить return перед next, eslint вызывает ошибку
       }
       res.send(like);
     })
@@ -86,6 +87,7 @@ module.exports.dislikeCard = (req, res, next) => {
     .then((like) => {
       if (!like) {
         next(new NotFoundError('Данная карточка не найдена.'));
+        return; // если поставить return перед next, eslint вызывает ошибку
       }
       res.send(like);
     })
