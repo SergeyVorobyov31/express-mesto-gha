@@ -1,5 +1,8 @@
 const Card = require('../models/card');
-const { BadRequestError, NotFoundError, ServerError, ForbiddenError } = require('../errors/errors');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
+const ServerError = require('../errors/ServerError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 module.exports.getCard = (req, res, next) => {
   Card.find({})
@@ -11,14 +14,12 @@ module.exports.getCard = (req, res, next) => {
 
 module.exports.createCard = (req, res, next) => {
   const owner = req.user.id;
-  console.log(req.body);
   const { name, link } = req.body;
   Card.create({ name, link, owner })
     .then((newCard) => {
       res.send(newCard);
     })
     .catch((e) => {
-      console.log(e);
       if (e.name === 'ValidationError') {
         next(new BadRequestError('Введены некоректные данные.'));
       } else {
@@ -39,7 +40,6 @@ module.exports.deleteCard = (req, res, next) => {
       const cardOwner = card.owner.toString();
       if (owner !== cardOwner) {
         next(new ForbiddenError('Карточка не принадлежит данному пользователю.'));
-        return;
       } else {
         Card.findByIdAndRemove(cardId)
           .then(() => {

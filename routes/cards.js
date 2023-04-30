@@ -8,11 +8,24 @@ const {
 router.get('/', getCard);
 router.delete('/:cardId', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string(),
+    cardId: Joi.string().length(24).hex().required(),
   }),
 }), deleteCard);
-router.put('/:cardId/likes', likeCard);
-router.delete('/:cardId/likes', dislikeCard);
-router.post('/', createCard);
+router.put('/:cardId/likes', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().length(24).hex().required(),
+  }),
+}), likeCard);
+router.delete('/:cardId/likes', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().length(24).hex().required(),
+  }),
+}), dislikeCard);
+router.post('/', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required(),
+    link: Joi.string().regex(/[-a-zA-Z0-9@:%_+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_+.~#?&//=]*)?/i).required(),
+  }),
+}), createCard);
 
 module.exports = router;

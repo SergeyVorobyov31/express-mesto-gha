@@ -1,7 +1,11 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const randomSecretKey = require('../constants/constants');
-const { BadRequestError, NotFoundError, ServerError, UnauthorizedError } = require('../errors/errors');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
+const ServerError = require('../errors/ServerError');
+const UnauthorizedError = require('../errors/UnauthorizedError');
+const ConflictHttpError = require('../errors/ConflictHttpError');
 
 const User = require('../models/user');
 
@@ -26,7 +30,7 @@ module.exports.getMyUser = (req, res, next) => {
       if (e.name === 'CastError') {
         next(new BadRequestError('Пользователь с таким id не найден. Некорректный id.'));
       } else if (e.name === 'NotFound') {
-        next(new NotFoundError('Пользователь с таким id не найден. Несуществующий id.'));
+        next(e);
       } else {
         next(new ServerError('Ошибка на сервере.'));
       }
@@ -47,7 +51,7 @@ module.exports.getUsersById = (req, res, next) => {
       if (e.name === 'CastError') {
         next(new BadRequestError('Пользователь с таким id не найден. Некорректный id.'));
       } else if (e.name === 'NotFound') {
-        next(new NotFoundError('Пользователь с таким id не найден. Несуществующий id.'));
+        next(e);
       } else {
         next(new ServerError('Ошибка на сервере.'));
       }
@@ -79,11 +83,10 @@ module.exports.createUser = (req, res, next) => {
       if (e.name === 'ValidationError') {
         next(new BadRequestError('Введены некоректные данные.'));
       } else if (e.code === 11000) {
-        next(new UnauthorizedError('Пользователь с таким email уже существует.'));
+        next(new ConflictHttpError('Пользователь с таким email уже существует.'));
       } else {
         next(new ServerError('Ошибка на сервере.'));
       }
-      next(e);
     });
 };
 
@@ -99,7 +102,7 @@ module.exports.updateUser = (req, res, next) => {
     })
     .catch((e) => {
       if (e.name === 'NotFound') {
-        next(new NotFoundError('Пользователь с таким id не найден.'));
+        next(e);
       } else if (e.name === 'ValidationError') {
         next(new BadRequestError('Введены некоректные данные.'));
       } else {
@@ -121,7 +124,7 @@ module.exports.updateAvatar = (req, res, next) => {
     })
     .catch((e) => {
       if (e.name === 'NotFound') {
-        next(new NotFoundError('Пользователь с таким id не найден.'));
+        next(e);
       } else if (e.name === 'ValidationError') {
         next(new BadRequestError('Введены некоректные данные.'));
       } else {
@@ -136,12 +139,12 @@ module.exports.login = (req, res, next) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        next(new UnauthorizedError('Неправильные почта или пароль'));
+        return next(new UnauthorizedError('Неправильные почта или пароль'));
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            next(new UnauthorizedError('Неправильные почта или пароль'));
+            return next(new UnauthorizedError('Неправильные почта или пароль'));
           }
           const token = jwt.sign({ id: user._id }, randomSecretKey);
           res.cookie('jwt', token, {
@@ -152,7 +155,5 @@ module.exports.login = (req, res, next) => {
           return token;
         });
     })
-    .catch(() => {
-      next(new UnauthorizedError('Неправильные почта или пароль'));
-    });
+    .catch(next);
 };

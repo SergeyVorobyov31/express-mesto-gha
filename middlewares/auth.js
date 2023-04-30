@@ -1,10 +1,9 @@
 const jwt = require('jsonwebtoken');
-const { UnauthorizedError } = require('../errors/errors');
+const UnauthorizedError = require('../errors/UnauthorizedError');
 const randomSecretKey = require('../constants/constants');
 
 module.exports = (req, res, next) => {
-  const authorization = req.headers.cookie;
-  if (!authorization || !authorization.startsWith('jwt=')) {
+  if (!req.cookies.jwt) {
     next(new UnauthorizedError('Необходима авторизация'));
   }
   const token = req.cookies.jwt;

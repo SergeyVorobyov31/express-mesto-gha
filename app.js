@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 const auth = require('./middlewares/auth');
 const { createUser, login } = require('./controllers/users');
+const NotFoundError = require('./errors/NotFoundError');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -36,9 +37,7 @@ app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
 app.use('*', (req, res, next) => {
-  const err = new Error('Данного маршрута не существует');
-  err.statusCode = 404;
-  next(err);
+  next(new NotFoundError('Данного маршрута не существует'));
 });
 
 app.use(errors());
